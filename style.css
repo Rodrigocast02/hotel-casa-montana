@@ -9,3 +9,5 @@
 .hero{isolation:isolate;background-image:none;overflow:hidden}.hero-slide{position:absolute;inset:0;z-index:-2;background-position:center;background-size:cover;opacity:0;transition:opacity 1s ease}.hero-slide.is-active{opacity:1}.hero::before{content:'';position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,rgba(19,40,9,.86),rgba(19,40,9,.20))}.hero-controls{position:absolute;bottom:75px;left:8%;display:flex;align-items:center;gap:18px;font-size:11px;color:white}.hero-controls span{letter-spacing:2px}.hero-controls button{background:#10240a66;border:1px solid #ffffff70;color:white;padding:9px 13px;font:inherit;cursor:pointer}@media(max-width:720px){.hero-controls{bottom:60px;left:7%}}@media(prefers-reduced-motion:reduce){.hero-slide{transition:none}}
 
 .hero-controls{display:none}
+
+.booking-wrap + .rooms{margin-top:28px;padding-top:42px}@media(max-width:720px){.booking-wrap + .rooms{margin-top:20px;padding-top:30px}}
