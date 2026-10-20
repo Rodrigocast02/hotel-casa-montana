@@ -44,5 +44,7 @@ window.addEventListener('pagehide',()=>{session=null;reservations=[]});
 
 setInterval(()=>{if(session&&!document.hidden)load().catch(e=>notify(e.message))},60000);
 
-async function restoreSession(){try{const saved=JSON.parse(sessionStorage.getItem(sessionKey)||'null');if(!saved?.access_token||!saved?.refresh_token||!Number.isFinite(saved.expires_at))return;session=saved;byId('login-note').textContent='Restaurando sesión…';await load();byId('login-panel').hidden=true;byId('dashboard').hidden=false;byId('logout').hidden=false;byId('login-note').textContent=''}catch(error){clearSession();byId('login-note').textContent='No se pudo restaurar la sesión. Inicia sesión de nuevo.'}}
+async function restoreSession(){
+ try{const saved=JSON.parse(sessionStorage.getItem(sessionKey)||'null');if(!saved?.access_token||!saved?.refresh_token||!Number.isFinite(saved.expires_at))return;session=saved;await load();byId('dashboard').hidden=false;byId('logout').hidden=false;byId('login-note').textContent=''}catch(error){clearSession();byId('login-note').textContent='No se pudo restaurar la sesión. Inicia sesión de nuevo.'}finally{byId('session-loading').hidden=true;byId('login-panel').hidden=!byId('dashboard').hidden}
+}
 restoreSession();
