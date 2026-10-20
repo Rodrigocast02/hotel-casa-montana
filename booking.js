@@ -1,7 +1,7 @@
 let language=new URLSearchParams(location.search).get('lang')==='en'?'en':'es';
 const $=id=>document.getElementById(id);let requestId=crypto.randomUUID(),lastAvailability=null,sequence=0,debounce;
 const rates={single:[[200,300],[240,380]],double:[[300,400,500,600],[340,480,620,760]],vip:[[400,600],[440,680]]};
-function translate(){document.documentElement.lang=language;document.querySelectorAll('[data-es]').forEach(el=>el.innerHTML=el.dataset[language]);$('language').textContent=language==='es'?'EN':'ES'}
+function translate(){document.documentElement.lang=language;document.querySelectorAll('[data-es]').forEach(el=>el.innerHTML=el.dataset[language]);$('language').textContent='Español / Inglés'}
 function updateGuests(){const previous=+$('guests').value;const max=$('room').value==='double'?4:2;$('guests').replaceChildren(...Array.from({length:max},(_,i)=>new Option(String(i+1),String(i+1),false,i+1===Math.min(previous,max))));}
 function iso(d){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
 const today=new Date();$('arrival').min=iso(today);$('arrival').value=iso(today);today.setDate(today.getDate()+1);$('departure').min=iso(today);$('departure').value=iso(today);
