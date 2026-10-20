@@ -16,7 +16,25 @@ if(r.status!=='cancelled'){const cancel=document.createElement('button');cancel.
 byId('search-reservations').addEventListener('input',render);byId('filter-status').addEventListener('change',render);
 byId('refresh-admin').addEventListener('click',()=>load().catch(e=>notify(e.message)));byId('availability-admin').addEventListener('click',()=>inventory().catch(e=>notify(e.message)));
 byId('toggle-booking').addEventListener('click',async()=>{if(!confirm(bookingOpen?'¿Pausar nuevas reservas desde la web?':'¿Activar reservas? Verifica que estén registradas todas las reservas del hotel.'))return;try{await call('admin-setting',{open:!bookingOpen});await load()}catch(error){notify(error.message)}});
-byId('manual-form').addEventListener('submit',async event=>{event.preventDefault();const b=event.submitter;b.disabled=true;try{await call('admin-reserve',{data:{request_id:manualId,room:byId('manual-room').value,arrival:byId('manual-arrival').value,departure:byId('manual-departure').value,guests:+byId('manual-guests').value,breakfast:byId('manual-breakfast').value==='1',first_name:byId('manual-first').value.trim(),last_name:byId('manual-last').value.trim(),phone:byId('manual-phone').value.trim(),document_type:byId('manual-document-type').value,document:byId('manual-document').value.trim(),source:byId('manual-source').value,accept_terms:true}});manualId=crypto.randomUUID();byId('manual-document').value='';await load();notify('Reserva guardada. Disponibilidad actualizada.')}catch(error){notify(error.message)}finally{b.disabled=false}});
+function manualStatus(message,error=false){const node=byId('manual-status');node.textContent=message;node.style.color=error?'#a12622':'#284611'}
+function validateManual(){
+ const doc=byId('manual-document'),type=byId('manual-document-type').value;
+ doc.value=doc.value.replace(/[\s-]/g,'').toUpperCase();
+ doc.setCustomValidity(type==='dpi'?(/^\d{13}$/.test(doc.value)?'':'El DPI debe tener exactamente 13 dígitos.'):(/^[A-Z0-9]{5,20}$/.test(doc.value)?'':'El pasaporte debe tener entre 5 y 20 letras o números.'));
+ byId('manual-document-help').textContent=type==='dpi'?'DPI: 13 dígitos, sin espacios ni guiones.':'Pasaporte: entre 5 y 20 letras o números.';
+ const guests=byId('manual-guests'),max=byId('manual-room').value==='double'?4:2;guests.max=max;guests.setCustomValidity(+guests.value>=1&&+guests.value<=max?'':'Esta habitación admite entre 1 y '+max+' personas.');
+ const departure=byId('manual-departure');departure.setCustomValidity(departure.value>byId('manual-arrival').value?'':'La salida debe ser posterior a la entrada.');
+}
+for(const id of ['manual-document','manual-document-type','manual-guests','manual-room','manual-arrival','manual-departure'])byId(id).addEventListener('input',validateManual);
+byId('manual-form').addEventListener('invalid',event=>manualStatus(event.target.validationMessage,true),true);
+byId('manual-form').addEventListener('submit',async event=>{
+ event.preventDefault();validateManual();if(!byId('manual-form').reportValidity())return;
+ const b=event.submitter||byId('manual-form').querySelector('button[type="submit"]');b.disabled=true;manualStatus('Guardando reserva…');
+ try{const result=await call('admin-reserve',{data:{request_id:manualId,room:byId('manual-room').value,arrival:byId('manual-arrival').value,departure:byId('manual-departure').value,guests:+byId('manual-guests').value,breakfast:byId('manual-breakfast').value==='1',first_name:byId('manual-first').value.trim(),last_name:byId('manual-last').value.trim(),phone:byId('manual-phone').value.trim(),document_type:byId('manual-document-type').value,document:byId('manual-document').value.trim(),source:byId('manual-source').value,accept_terms:true}});manualId=crypto.randomUUID();byId('manual-document').value='';byId('manual-document').setCustomValidity('');
+ const message='Reserva '+(result.reservation_number||result.id)+' guardada correctamente.';manualStatus(message);notify(message);
+ try{await load();manualStatus(message+' Disponibilidad actualizada.')}catch{manualStatus(message+' Pulsa Actualizar para recargar el listado.');}
+ }catch(error){manualStatus(error.message,true);notify(error.message)}finally{b.disabled=false}
+});
 // Mantener las credenciales solo en memoria; no guardar datos de huéspedes en almacenamiento local.
 window.addEventListener('pagehide',()=>{session=null;reservations=[]});
 
