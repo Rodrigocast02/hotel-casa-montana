@@ -1,0 +1,1 @@
+const HOTEL_PUBLIC_KEY="sb_publishable_FfuZU9GzkIZuLlrNfMyRgA_yIHPE-Pg";
