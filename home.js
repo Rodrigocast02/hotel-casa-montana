@@ -1,3 +1,5 @@
 let language=new URLSearchParams(location.search).get('lang')==='en'?'en':'es';
 function translate(){document.documentElement.lang=language;document.querySelectorAll('[data-es]').forEach(el=>el.innerHTML=el.dataset[language]);document.getElementById('language').textContent='Español / Inglés';document.querySelectorAll('[data-room]').forEach(el=>el.href=`reservar.html?room=${el.dataset.room}&lang=${language}`)}
 document.getElementById('language').addEventListener('click',()=>{language=language==='es'?'en':'es';translate()});translate();
+
+fetch('https://lhcvudzxfmpdclohlnwg.supabase.co/functions/v1/hotel-api',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'public-rates'})}).then(r=>{if(!r.ok)throw Error();return r.json()}).then(data=>{for(const rate of data.rates){if(rate.guests===1&&!rate.breakfast){const link=document.querySelector('[data-room="'+rate.room_type+'"]');const amount=link?.closest('.room-card')?.querySelector('.room-bottom strong');if(amount)amount.textContent='Q'+Number(rate.amount_gtq).toLocaleString('es-GT')}}}).catch(()=>{});
